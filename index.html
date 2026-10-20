@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Action Network: how prediction market users in 10 states compare on trading against their own politics and trading the midterms.">
+<title>State Breakdown: Prediction Market Users on Politics | Action Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0b1319; --navy2:#101c24; --green:#00b67a; --bright:#1fe3a4; --dark:#00865b;
+  --ink:#eef3f1; --muted:#9db0b6; --line:rgba(255,255,255,.14); --paper:#0b1319; --wash:#101c24; --soft:#142b24;
+  --card:#101c24; --track:#1a2730;
+  --display:"Barlow Condensed",Impact,"Arial Narrow",sans-serif; --serif:"Source Serif 4",Georgia,serif;
+  --gutter:clamp(18px,4vw,40px);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);}
+body{font-family:var(--serif);font-size:17px;line-height:1.6;}
+button{font:inherit;cursor:pointer;}
+h1,h2,h3{font-family:var(--display);margin:0;color:#fff;}
+.wrap{width:100%;max-width:980px;margin:0 auto;padding:0 var(--gutter);}
+.hero{background:var(--navy);color:#fff;padding:clamp(34px,6vw,54px) 0 clamp(30px,5vw,44px);border-bottom:1px solid var(--line);}
+.eyebrow{font-family:var(--display);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:14px;color:var(--bright);margin:0 0 10px;}
+.hero h1{font-size:clamp(30px,5vw,46px);font-weight:800;line-height:1.08;letter-spacing:-.01em;max-width:18ch;}
+.hero p{font-family:var(--serif);font-size:clamp(16px,2vw,18px);line-height:1.6;color:rgba(255,255,255,.82);max-width:62ch;margin:16px 0 0;}
+section{padding:clamp(34px,5vw,52px) 0;background:var(--paper);}
+section.alt{background:var(--navy2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.section-head{max-width:68ch;margin:0 0 26px;}
+.section-head h2{font-size:clamp(26px,3.6vw,34px);font-weight:750;line-height:1.1;color:#fff;}
+.section-head p{font-size:16px;line-height:1.6;color:var(--ink);margin:10px 0 0;}
+.section-head p strong{font-weight:600;color:#fff;}
+
+/* ---- Module A: toggle + ranked bars ---- */
+.toggle{display:inline-flex;border:1px solid var(--line);background:var(--card);margin:0 0 22px;}
+.toggle button{appearance:none;border:0;background:transparent;padding:12px 20px;font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.02em;color:var(--muted);border-right:1px solid var(--line);transition:background .15s ease,color .15s ease;}
+.toggle button:last-child{border-right:0;}
+.toggle button:hover{color:#fff;}
+.toggle button.active{background:var(--green);color:#06130e;}
+.toggle button:focus-visible{outline:3px solid var(--bright);outline-offset:-3px;}
+
+.avg-line{display:flex;align-items:center;gap:8px;margin:0 0 18px;font-family:var(--display);font-size:14px;font-weight:650;color:var(--bright);}
+.avg-line i{width:10px;height:10px;border:2px solid var(--bright);transform:rotate(45deg);flex:0 0 10px;}
+
+.rank-list{border:1px solid var(--line);background:var(--card);}
+.rank-row{position:relative;display:block;width:100%;border:0;border-bottom:1px solid var(--line);background:var(--card);text-align:left;padding:0;transition:background .15s ease;}
+.rank-row:last-child{border-bottom:0;}
+.rank-row:hover,.rank-row[aria-expanded="true"]{background:var(--soft);}
+.rank-row-main{display:grid;width:100%;grid-template-columns:34px minmax(110px,160px) 1fr 86px 22px;gap:14px;align-items:center;padding:13px 16px;border:0;background:transparent;text-align:left;}
+.rank-pos{font-family:var(--display);font-weight:800;font-size:18px;color:var(--muted);text-align:center;}
+.rank-name{font-family:var(--display);font-weight:650;font-size:17px;color:#fff;display:flex;flex-direction:column;gap:3px;}
+.rank-badge{display:inline-flex;width:fit-content;font-family:var(--display);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border:1px solid var(--bright);color:var(--bright);}
+.rank-badge.low{border-color:#ff9b8a;color:#ff9b8a;}
+.bar-track{position:relative;height:20px;background:var(--track);border:1px solid var(--line);overflow:visible;}
+.bar-fill{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--green),var(--bright));transition:width .7s cubic-bezier(.2,.7,.2,1);}
+.bar-avg-mark{position:absolute;top:-4px;bottom:-4px;width:2px;background:#fff;opacity:.6;}
+.rank-value{font-family:var(--display);font-weight:750;font-size:18px;text-align:right;color:#fff;white-space:nowrap;}
+.rank-caret{display:flex;align-items:center;justify-content:center;color:var(--bright);}
+.rank-caret svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease;}
+.rank-row[aria-expanded="true"] .rank-caret svg{transform:rotate(180deg);}
+.rank-detail{display:none;padding:4px 16px 18px 64px;border-bottom:1px solid var(--line);background:var(--navy2);}
+.rank-detail.open{display:block;}
+.rank-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);max-width:620px;}
+.rank-detail-cell{background:var(--card);padding:12px 14px;}
+.rank-detail-cell span{display:block;font-family:var(--display);font-size:12px;font-weight:650;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.rank-detail-cell b{font-family:var(--display);font-size:20px;font-weight:750;color:#fff;}
+
+/* ---- Module B ---- */
+.stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 30px;}
+.stat-card{background:var(--card);padding:20px 22px;}
+.stat-card b{display:block;font-family:var(--display);font-size:clamp(30px,4vw,40px);font-weight:800;color:var(--bright);line-height:1;}
+.stat-card span{display:block;margin-top:8px;font-size:15px;line-height:1.5;color:var(--ink);}
+
+.chartB{border:1px solid var(--line);background:var(--card);padding:22px clamp(16px,3vw,28px) 26px;position:relative;}
+.chartB-legend{display:flex;flex-wrap:wrap;gap:18px;margin:0 0 18px;font-family:var(--display);font-size:13.5px;font-weight:650;color:var(--muted);}
+.chartB-legend span{display:inline-flex;align-items:center;gap:7px;}
+.legend-swatch{width:14px;height:14px;display:inline-block;}
+.legend-swatch.state{background:linear-gradient(90deg,var(--green),var(--bright));}
+.legend-swatch.age{background:repeating-linear-gradient(135deg,rgba(255,255,255,.22) 0 3px,transparent 3px 7px);border:1px solid rgba(255,255,255,.35);}
+
+.chartB-scale{position:relative;height:34px;margin:0 0 6px;}
+.chartB-age-band{position:absolute;top:8px;bottom:8px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.14) 0 3px,transparent 3px 7px);border-left:2px dashed rgba(255,255,255,.5);border-right:2px dashed rgba(255,255,255,.5);}
+.chartB-age-label{position:absolute;top:0;font-family:var(--display);font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap;}
+.chartB-age-label.left{transform:translateX(-2px);}
+.chartB-age-label.right{transform:translateX(-100%);}
+
+.bbar-row{display:grid;grid-template-columns:150px 1fr 64px;gap:12px;align-items:center;padding:7px 0;}
+.bbar-label{font-family:var(--display);font-weight:650;font-size:15px;color:#fff;}
+.bbar-track{position:relative;height:22px;background:var(--track);border:1px solid var(--line);}
+.bbar-fill{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--green),var(--bright));transition:width .7s cubic-bezier(.2,.7,.2,1);}
+.bbar-band{position:absolute;top:-1px;bottom:-1px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.16) 0 3px,transparent 3px 7px);border-left:2px dashed rgba(255,255,255,.45);border-right:2px dashed rgba(255,255,255,.45);pointer-events:none;}
+.bbar-value{font-family:var(--display);font-weight:750;font-size:16px;text-align:right;color:#fff;}
+
+.note{margin:20px 0 0;font-size:14.5px;line-height:1.6;color:var(--muted);max-width:70ch;}
+.note strong{color:var(--ink);font-weight:600;}
+
+footer{padding:24px 0 40px;background:var(--paper);}
+footer p{font-size:13.5px;line-height:1.6;color:var(--muted);max-width:76ch;margin:0;}
+
+@media (max-width:640px){
+  .rank-row-main{grid-template-columns:26px minmax(0,1fr) 72px 18px;grid-template-areas:"pos name value caret" "pos bar bar bar";row-gap:8px;}
+  .rank-pos{grid-area:pos;}
+  .rank-name{grid-area:name;}
+  .rank-value{grid-area:value;}
+  .rank-caret{grid-area:caret;}
+  .bar-track{grid-area:bar;}
+  .rank-detail{padding-left:16px;}
+  .rank-detail-grid{grid-template-columns:1fr;max-width:none;}
+  .stat-pair{grid-template-columns:1fr;}
+  .bbar-row{grid-template-columns:1fr;row-gap:5px;}
+  .bbar-value{text-align:left;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Action Network · Prediction Market Politics Survey</p>
+    <h1>Where Prediction Market Users Trade Against Their Own Politics</h1>
+    <p>A survey of 2,495 prediction market users finds 38.3% have bet against their own political preference for profit. Among the 10 states with a large enough sample to report, the willingness to do that for money ranges from 45.3% in California down to 28.0% in Illinois.</p>
+  </div>
+</header>
+
+<section id="module-a">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>State rankings: politics-for-profit vs. midterm trading</h2>
+      <p>Switch the view to compare the 10 states with a reliable sample size on either question. Select a state to see both figures side by side.</p>
+    </div>
+
+    <div class="toggle" role="tablist" aria-label="Choose metric">
+      <button type="button" role="tab" aria-selected="true" data-metric="politics" class="active">Traded Against Own Politics</button>
+      <button type="button" role="tab" aria-selected="false" data-metric="midterms">Plans to Trade Midterms</button>
+    </div>
+
+    <div class="avg-line"><i aria-hidden="true"></i><span id="avg-line-label"></span></div>
+
+    <div class="rank-list" id="rank-list" role="list" aria-label="States ranked by selected metric"></div>
+
+    <p class="note">State-level figures are limited to states with at least 85 respondents among the 2,495 prediction market users surveyed. California tops both measures; Illinois is lowest on both.</p>
+  </div>
+</section>
+
+<section id="module-b" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>State differences on trading against political beliefs</h2>
+      <p>California's 45.3% is the highest of any state, but it's still well below the national rate for the youngest prediction market users. Illinois's 28.0% sits close to the rate among the oldest.</p>
+    </div>
+
+    <div class="stat-pair">
+      <div class="stat-card">
+        <b>45.3%</b>
+        <span>California, the highest state, is <strong>9.5 points below</strong> the 54.8% rate among 18&ndash;24 year&#8209;olds nationally.</span>
+      </div>
+      <div class="stat-card">
+        <b>28.0%</b>
+        <span>Illinois, the lowest state, sits <strong>1.5 points above</strong> the 26.5% rate among prediction market users 55 and older nationally.</span>
+      </div>
+    </div>
+
+    <div class="chartB">
+      <div class="chartB-legend">
+        <span><i class="legend-swatch state" aria-hidden="true"></i>State: traded against own politics</span>
+        <span><i class="legend-swatch age" aria-hidden="true"></i>National age range (55+ to 18&ndash;24)</span>
+      </div>
+      <div class="chartB-scale" id="chartB-scale"></div>
+      <div id="chartB-bars"></div>
+    </div>
+
+    <p class="note">The shaded band marks the national range across age groups among all prediction market users (26.5% for those 55 and older, up to 54.8% for 18&ndash;24 year&#8209;olds). It is a national reference line, not a state-level age breakdown &mdash; no state-by-age cross-tab was fielded, so the band shows where each state's overall figure falls relative to the generational spread, not the age mix within that state.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Source: Action Network survey of 2,495 US-based prediction market users, fielded by Research Without Barriers (RWB), October 2&ndash;6, 2026. State-level figures limited to states with at least 85 respondents.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+var STATE_DATA = [
+  {state:"California",      politics:45.3, midterms:61.4, n:236},
+  {state:"New York",        politics:41.1, midterms:58.3, n:168},
+  {state:"Florida",         politics:40.4, midterms:54.3, n:188},
+  {state:"Texas",           politics:40.3, midterms:59.3, n:263},
+  {state:"Ohio",            politics:39.4, midterms:57.4, n:94},
+  {state:"Georgia",         politics:37.1, midterms:56.2, n:89},
+  {state:"Pennsylvania",    politics:35.2, midterms:59.3, n:108},
+  {state:"North Carolina",  politics:34.5, midterms:58.6, n:87},
+  {state:"Michigan",        politics:32.9, midterms:54.1, n:85},
+  {state:"Illinois",        politics:28.0, midterms:47.0, n:100}
+];
+
+var NATIONAL = {politics:38.3, midterms:57.3};
+var AGE_RANGE = {low:26.5, high:54.8}; // 55+ to 18-24, national, prediction market users
+var METRIC_LABEL = {politics:"Traded against own politics", midterms:"Plans to trade midterms"};
+
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Module A ---------- */
+var currentMetric = 'politics';
+var openDetail = null;
+
+function sortedStates(metric){
+  return STATE_DATA.slice().sort(function(a,b){ return b[metric]-a[metric]; });
+}
+
+function maxOf(metric){
+  return Math.max.apply(null, STATE_DATA.map(function(d){ return d[metric]; }));
+}
+
+function renderAvgLabel(){
+  document.getElementById('avg-line-label').textContent =
+    'National average among prediction market users: ' + NATIONAL[currentMetric].toFixed(1) + '%';
+}
+
+function rowMarkup(d, rank, metric, scaleMax){
+  var isTop = d.state === 'California';
+  var isBottom = d.state === 'Illinois';
+  var badge = '';
+  if(isTop) badge = '<span class="rank-badge">Highest in sample</span>';
+  if(isBottom) badge = '<span class="rank-badge low">Lowest in sample</span>';
+  var val = d[metric];
+  var avgPct = (NATIONAL[metric]/scaleMax*100).toFixed(2);
+  var detailId = 'detail-' + d.state.replace(/\s+/g,'-').toLowerCase();
+  return (
+    '<div class="rank-row" data-state="'+d.state+'">' +
+      '<button type="button" class="rank-row-main" aria-expanded="false" aria-controls="'+detailId+'">' +
+        '<span class="rank-pos">'+rank+'</span>' +
+        '<span class="rank-name">'+d.state+badge+'</span>' +
+        '<span class="bar-track"><span class="bar-fill" data-target="'+((val/scaleMax)*100)+'"></span><span class="bar-avg-mark" style="left:'+avgPct+'%"></span></span>' +
+        '<span class="rank-value">'+val.toFixed(1)+'%</span>' +
+        '<span class="rank-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>' +
+      '</button>' +
+      '<div class="rank-detail" id="'+detailId+'">' +
+        '<div class="rank-detail-grid">' +
+          '<div class="rank-detail-cell"><span>Traded against politics</span><b>'+d.politics.toFixed(1)+'%</b></div>' +
+          '<div class="rank-detail-cell"><span>Plans to trade midterms</span><b>'+d.midterms.toFixed(1)+'%</b></div>' +
+          '<div class="rank-detail-cell"><span>Respondents (n)</span><b>'+d.n+'</b></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function renderRankList(animate){
+  var list = document.getElementById('rank-list');
+  var rows = sortedStates(currentMetric);
+  var scaleMax = Math.ceil(maxOf(currentMetric)/5)*5;
+  list.innerHTML = rows.map(function(d,i){ return rowMarkup(d, i+1, currentMetric, scaleMax); }).join('');
+  renderAvgLabel();
+  requestAnimationFrame(function(){
+    var fills = list.querySelectorAll('.bar-fill');
+    fills.forEach(function(el){
+      var target = el.getAttribute('data-target');
+      if(reduced){ el.style.width = target+'%'; }
+      else { el.style.width = target+'%'; }
+    });
+  });
+}
+
+document.querySelectorAll('.toggle button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    if(btn.classList.contains('active')) return;
+    document.querySelectorAll('.toggle button').forEach(function(b){
+      b.classList.toggle('active', b===btn);
+      b.setAttribute('aria-selected', String(b===btn));
+    });
+    currentMetric = btn.getAttribute('data-metric');
+    openDetail = null;
+    renderRankList(true);
+  });
+});
+
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('.rank-row-main');
+  if(!btn) return;
+  var row = btn.closest('.rank-row');
+  var detail = row.querySelector('.rank-detail');
+  var isOpen = btn.getAttribute('aria-expanded') === 'true';
+  // close any other open row
+  document.querySelectorAll('.rank-row-main[aria-expanded="true"]').forEach(function(b){
+    if(b!==btn){ b.setAttribute('aria-expanded','false'); b.closest('.rank-row').querySelector('.rank-detail').classList.remove('open'); }
+  });
+  btn.setAttribute('aria-expanded', String(!isOpen));
+  detail.classList.toggle('open', !isOpen);
+});
+
+renderRankList(false);
+
+/* ---------- Module B ---------- */
+function renderChartB(){
+  var rows = STATE_DATA.slice().sort(function(a,b){ return b.politics - a.politics; });
+  var scaleMax = Math.ceil(maxOf('politics')/5)*5;
+  // the shared scale for both the age band and the bars
+  var bandLeftPct = (AGE_RANGE.low/scaleMax)*100;
+  var bandWidthPct = ((AGE_RANGE.high-AGE_RANGE.low)/scaleMax)*100;
+
+  var scaleEl = document.getElementById('chartB-scale');
+  scaleEl.innerHTML =
+    '<div class="chartB-age-band" style="left:'+bandLeftPct+'%;width:'+bandWidthPct+'%"></div>' +
+    '<span class="chartB-age-label left" style="left:'+bandLeftPct+'%">'+AGE_RANGE.low.toFixed(1)+'% (55+)</span>' +
+    '<span class="chartB-age-label right" style="left:'+(bandLeftPct+bandWidthPct)+'%">'+AGE_RANGE.high.toFixed(1)+'% (18&ndash;24)</span>';
+
+  var barsEl = document.getElementById('chartB-bars');
+  barsEl.innerHTML = rows.map(function(d){
+    var fillPct = (d.politics/scaleMax)*100;
+    return (
+      '<div class="bbar-row">' +
+        '<span class="bbar-label">'+d.state+'</span>' +
+        '<span class="bbar-track">' +
+          '<span class="bbar-band" style="left:'+bandLeftPct+'%;width:'+bandWidthPct+'%"></span>' +
+          '<span class="bbar-fill" data-target="'+fillPct+'"></span>' +
+        '</span>' +
+        '<span class="bbar-value">'+d.politics.toFixed(1)+'%</span>' +
+      '</div>'
+    );
+  }).join('');
+
+  requestAnimationFrame(function(){
+    barsEl.querySelectorAll('.bbar-fill').forEach(function(el){
+      el.style.width = el.getAttribute('data-target')+'%';
+    });
+  });
+}
+
+renderChartB();
+
+})();
+</script>
+</body>
+</html>
